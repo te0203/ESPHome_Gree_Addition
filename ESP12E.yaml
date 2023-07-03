@@ -1,0 +1,159 @@
+## #######################################################################################
+## ESP-12E-Witty-12 прошивка для ESP
+## #######################################################################################
+#  Тут всё без изменений точно так как у Hagakurje https://github.com/Hagakurje/ESPHome_Gree_AC
+#
+## used PINS on ESP-12E-Witty-12
+##
+## GPIO 5 IR receiver
+## GPIO 14 IR transmitter
+##
+##
+## ----------------------------------------------------------------
+
+
+######################################################################
+# set Переменные
+######################################################################
+substitutions:
+  hostname: "esp-12e-witty-12"
+  friendly_name: "ESP-12E-Witty-12"
+  board: nodemcuv2
+  logger_level: debug
+  api_key: !secret api_key_12
+  ota_password: !secret ota_password_12
+  static_ip: 192.168.5.12
+  receiver_pin: "5"
+  ##
+  ## ВНИМАНИЕ!!!!
+  ##
+  ## Должен совпадать с номером пина на строкке 14 в файле gree.h
+  transmitter_pin: "14"
+
+
+######################################################################
+# set Общие настройки и сенсоры
+######################################################################
+packages:
+  wifi: !include include/wifi.yaml
+  ota: !include include/ota.yaml
+  web_server: !include include/web_server.yaml
+  time: !include include/time.yaml
+  esphome: !include include/esphome.yaml
+  api: !include include/api.yaml
+  logger: !include include/logger.yaml
+  captive_portal: !include include/captive_portal.yaml
+  device_base: !include include/device_base.yaml
+
+######################################################################
+# Дополняем esphome
+######################################################################
+esphome:
+  includes:
+  - custom/gree.h
+  libraries:
+  - IRremoteESP8266
+
+
+######################################################################
+# Глобальные переменные
+######################################################################
+globals:
+- id: transmitter_pin
+  type: uint16_t
+  restore_value: no
+  initial_value: $transmitter_pin
+
+
+######################################################################
+# set esp8266
+######################################################################
+esp8266:
+  board: $board
+  framework:
+    version: recommended
+
+
+######################################################################
+# set switch
+######################################################################
+switch:
+- platform: custom
+  lambda: |-
+    auto gree_light_switch = new GreeLightSwitch();
+    App.register_component(gree_light_switch);
+    return {gree_light_switch};
+
+  switches:
+    name: "Dalnroom AC light"
+    id: dalnroom_ac_light
+
+
+######################################################################
+# set sensor
+######################################################################
+sensor:
+- platform: homeassistant
+  name: "Temperature Sensor dalnroom"
+  entity_id: sensor.temperature_158d00044a05d7 # Датчик температуры в комнате с кондиционером
+  id: sensor_temp
+
+
+######################################################################
+# set climate
+######################################################################
+climate:
+
+- platform: custom
+  lambda: |-
+    auto dalnroom_ac = new GreeAC();
+    dalnroom_ac->set_temp_sensor(id(sensor_temp));
+    App.register_component(dalnroom_ac);
+    return {dalnroom_ac};
+
+  climates:
+  - name: "Dalnroom AC"
+
+
+
+######################################################################
+# set remote_receiver приёмник
+######################################################################
+remote_receiver:
+  id: receiver
+  pin:
+    number: $receiver_pin
+    inverted: true
+    mode:
+      input: true
+      analog: false
+      output: false
+      open_drain: false
+      pullup: true
+      pulldown: false
+  #  dump: raw
+  dump: all
+  tolerance: 25
+  buffer_size: 2000 #1000
+  filter: 50us #50us
+  idle: 10ms #10ms
+  memory_blocks: 3
+
+
+
+######################################################################
+# set remote_transmitter передатчик
+######################################################################
+remote_transmitter:
+  pin:
+    number: $transmitter_pin
+    inverted: false
+    mode:
+      output: true
+      analog: false
+      input: false
+      open_drain: false
+      pullup: false
+      pulldown: false
+  carrier_duty_percent: 50%
+  id: transmitter
