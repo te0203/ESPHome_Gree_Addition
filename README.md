@@ -12,7 +12,7 @@ https://github.com/Hagakurje/ESPHome_Gree_AC
 
 `ac.setSwingVertical(false, kGreeSwingDown);
 `
-Взять их можно <a href=”https://crankyoldgit.github.io/IRremoteESP8266/doxygen/html/ir__Gree_8h.html”>тут</a>
+Взять их можно [тут](https://crankyoldgit.github.io/IRremoteESP8266/doxygen/html/ir__Gree_8h.html)
 
 В строках с 226 по 307 можно добавить свои предустановки. 
-Классы берём <a href=”https://crankyoldgit.github.io/IRremoteESP8266/doxygen/html/classIRGreeAC.html#a1b571dea8a5bf553554e45074f3a01c0”>тут</a> 
+Классы берём [тут](https://crankyoldgit.github.io/IRremoteESP8266/doxygen/html/classIRGreeAC.html#a1b571dea8a5bf553554e45074f3a01c0) 
