@@ -1,37 +1,35 @@
-###  На основании https://github.com/Hagakurje/ESPHome_Gree_AC кое-что добавлено
-## Packages Настройка Home Assistant
-##
-##
+ac_daln:
 
 
-daln:
-
-## Поля в HA для сохранения настроек кондиционера
   input_number:
+
     status_climate_dalnroom_temp:
-      name: "Целевая температура"
+      name: "Целевая температура DalnroomAC"
       step: 1
       min: 10
       max: 35
 
+
   input_text:
+
     status_climate_dalnroom_hvac:
-      name: "Режим"
+      name: "Режим DalnroomAC"
+
     status_climate_dalnroom_fan:
-      name: "Вентилятор"
+      name: "Fan DalnroomAC"
+
     status_climate_dalnroom_swing:
-      name: "Направление обдува"
+      name: "Swing DalnroomAC"
+
     status_climate_dalnroom_preset:
-      name: "Предустановка"
+      name: "Preset  DalnroomAC"
 
-
-## Сенсоры для отображения настроек на основании полей
   sensor:
 
   - platform: template
     sensors:
       status_climate_dalnroom_hvac:
-        friendly_name: "Режим"
+        friendly_name: "Режим DalnroomAC"
         value_template: >-
           {% if is_state('input_text.status_climate_dalnroom_hvac', 'off') %}
             Выключен
@@ -50,7 +48,7 @@ daln:
           {% endif %}
 
       status_climate_dalnroom_fan:
-        friendly_name: "Fan"
+        friendly_name: "Fan DalnroomAC"
         value_template: >-
           {% if is_state('input_text.status_climate_dalnroom_fan', 'auto') %}
             Авто
@@ -67,7 +65,7 @@ daln:
           {% endif %}    
 
       status_climate_dalnroom_swing:
-        friendly_name: "Swing"
+        friendly_name: "Swing DalnroomAC"
         value_template: >-
           {% if is_state('input_text.status_climate_dalnroom_swing', 'off') %}
             Отключено
@@ -80,10 +78,10 @@ daln:
           {% else %}
             Неопределено
           {% endif %}
+      
 
-      ## Добавлены предустановки
       status_climate_dalnroom_preset:
-        friendly_name: "Профиль"
+        friendly_name: "Профиль DalnroomAC"
         value_template: >-
           {% if is_state('input_text.status_climate_dalnroom_preset', 'activity') %}
             Активность
@@ -107,11 +105,11 @@ daln:
       
 
       status_climate_dalnroom_temp:
-        friendly_name: "Температура"
+        friendly_name: "Температура DalnroomAC"
         value_template: "{{ states('input_number.status_climate_dalnroom_temp') }}"
 
 
-## Автоматизации для заполнении полей настроек
+
   automation:
   - id: sync_climate_dalnroom_hvac
     alias: Sync Climate dalnroom HVAC mode
@@ -167,7 +165,7 @@ daln:
       data:
         value: "{{ state_attr('climate.dalnroom_ac','swing_mode') }}"
 
-  ## Добавлены предустановки
+
   - id: sync_climate_dalnroom_preset
     alias: Sync Climate dalnroom Preset
     trigger:
@@ -219,4 +217,4 @@ daln:
         fan: "{{ states('input_text.status_climate_dalnroom_fan') }}"
         swing: "{{ states('input_text.status_climate_dalnroom_swing') }}"
         light: "{{ false if is_state('input_text.status_climate_dalnroom_hvac', 'off') else true }}"
-        preset: "{{ states('input_text.status_climate_dalnroom_preset') }}" ## Добавлены предустановки
+        preset: "{{ states('input_text.status_climate_dalnroom_preset') }}"

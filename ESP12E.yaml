@@ -1,12 +1,12 @@
 ## #######################################################################################
-## ESP-12E-Witty-12 прошивка для ESP
+## ESP-12E-Witty-12
 ## #######################################################################################
-#  Тут всё без изменений точно так как у Hagakurje https://github.com/Hagakurje/ESPHome_Gree_AC
+#
 #
 ## used PINS on ESP-12E-Witty-12
 ##
-## GPIO 5 IR receiver
-## GPIO 14 IR transmitter
+## GPIO 5 IR приёмник
+## GPIO 14 IR передатчик
 ##
 ##
 ## ----------------------------------------------------------------
@@ -17,17 +17,21 @@
 ######################################################################
 substitutions:
   hostname: "esp-12e-witty-12"
+  #    nameService: "esp_12e_witty_12"
   friendly_name: "ESP-12E-Witty-12"
   board: nodemcuv2
   logger_level: debug
   api_key: !secret api_key_12
   ota_password: !secret ota_password_12
   static_ip: 192.168.5.12
+  ## ВНИМАНИЕ!!!!
+  ##
+  ## Вручную поменять номер пина в файле receiver.h перед компиляцией для нового устройства.
   receiver_pin: "5"
   ##
   ## ВНИМАНИЕ!!!!
   ##
-  ## Должен совпадать с номером пина на строкке 14 в файле gree.h
+  ## Вручную поменять номер пина в файле transmitter.h перед компиляцией для нового устройства.
   transmitter_pin: "14"
 
 
@@ -50,7 +54,8 @@ packages:
 ######################################################################
 esphome:
   includes:
-  - custom/gree.h
+  - include/custom/transmitter.h
+  - include/custom/receiver.h
   libraries:
   - IRremoteESP8266
 
@@ -59,10 +64,51 @@ esphome:
 # Глобальные переменные
 ######################################################################
 globals:
+#- id: nameService
+#  type: std::string
+#  restore_value: no
+#  initial_value: $nameService
+
 - id: transmitter_pin
   type: uint16_t
   restore_value: no
   initial_value: $transmitter_pin
+
+- id: receiver_pin
+  type: uint16_t
+  restore_value: no
+  initial_value: $receiver_pin
+
+
+######################################################################
+# Дополняем api
+######################################################################
+api:
+  services:
+  - service: send_nec_command
+    variables:
+      address_str: string
+      command_str: string
+    then:
+    - remote_transmitter.transmit_nec:
+        address: !lambda 'return (int)strtol(address_str.c_str(), NULL, 16);'
+        command: !lambda 'return (int)strtol(command_str.c_str(), NULL, 16);'
+
+  - service: send_pronto_command
+    variables:
+      data: string
+    then:
+    - remote_transmitter.transmit_pronto:
+        data: !lambda 'return data;'
+
+  - service: send_raw_command # service name (device name will be used as prefix)
+    variables: # list of service params
+      command: int[]
+    then:
+    - remote_transmitter.transmit_raw:
+        carrier_frequency: 38kHz
+        code: !lambda 'return command;' # use array from service param
+
 
 
 ######################################################################
@@ -72,6 +118,59 @@ esp8266:
   board: $board
   framework:
     version: recommended
+
+
+######################################################################
+# set esp32
+######################################################################
+#esp32:
+
+######################################################################
+# set esp32_touch
+######################################################################
+#esp32_touch:
+
+
+######################################################################
+# set i2c
+######################################################################
+#i2c:
+
+
+######################################################################
+# set uart
+######################################################################
+#uart:
+
+
+######################################################################
+# set modbus
+######################################################################
+#modbus:
+
+
+######################################################################
+# set dallas
+######################################################################
+#dallas:
+
+
+######################################################################
+# set display
+######################################################################
+#display:
+
+
+######################################################################
+# set text_sensor
+######################################################################
+#text_sensor:
+
+
+######################################################################
+# set binary_sensor
+######################################################################
+#binary_sensor:
 
 
 ######################################################################
@@ -95,8 +194,35 @@ switch:
 sensor:
 - platform: homeassistant
   name: "Temperature Sensor dalnroom"
-  entity_id: sensor.temperature_158d00044a05d7 # Датчик температуры в комнате с кондиционером
+  entity_id: sensor.temperature_158d00044a05d7
   id: sensor_temp
+
+- platform: custom
+  lambda: |-
+    auto myReceiver = new MyReceiver();
+    App.register_component(myReceiver);
+    return {myReceiver};
+
+  sensors:
+  - name: "myReceiver"
+
+
+######################################################################
+# set status_led
+######################################################################
+#status_led:
+
+
+######################################################################
+# set output
+######################################################################
+#output:
+
+
+######################################################################
+# set light
+######################################################################
+#light:
 
 
 ######################################################################
@@ -115,12 +241,10 @@ climate:
   - name: "Dalnroom AC"
 
 
-
 ######################################################################
 # set remote_receiver приёмник
 ######################################################################
 remote_receiver:
-  id: receiver
   pin:
     number: $receiver_pin
     inverted: true
@@ -134,10 +258,11 @@ remote_receiver:
   #  dump: raw
   dump: all
   tolerance: 25
-  buffer_size: 2000 #1000
+  buffer_size: 1024 #1000
   filter: 50us #50us
   idle: 10ms #10ms
   memory_blocks: 3
+
 
 
 
@@ -156,4 +281,3 @@ remote_transmitter:
       pullup: false
       pulldown: false
   carrier_duty_percent: 50%
-  id: transmitter
