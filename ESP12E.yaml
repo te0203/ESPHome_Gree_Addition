@@ -16,22 +16,15 @@
 # set Переменные
 ######################################################################
 substitutions:
-  hostname: "esp-12e-witty-12"
-  #    nameService: "esp_12e_witty_12"
-  friendly_name: "ESP-12E-Witty-12"
+  hostname: "dalnac"
+  friendly_name: "DalnAC"
   board: nodemcuv2
   logger_level: debug
   api_key: !secret api_key_12
   ota_password: !secret ota_password_12
   static_ip: 192.168.5.12
   ## ВНИМАНИЕ!!!!
-  ##
-  ## Вручную поменять номер пина в файле receiver.h перед компиляцией для нового устройства.
   receiver_pin: "5"
-  ##
-  ## ВНИМАНИЕ!!!!
-  ##
-  ## Вручную поменять номер пина в файле transmitter.h перед компиляцией для нового устройства.
   transmitter_pin: "14"
 
 
@@ -54,8 +47,7 @@ packages:
 ######################################################################
 esphome:
   includes:
-  - include/custom/transmitter.h
-  - include/custom/receiver.h
+  - include/custom/gree.h
   libraries:
   - IRremoteESP8266
 
@@ -63,51 +55,14 @@ esphome:
 ######################################################################
 # Глобальные переменные
 ######################################################################
-globals:
-#- id: nameService
-#  type: std::string
-#  restore_value: no
-#  initial_value: $nameService
+#globals:
 
-- id: transmitter_pin
-  type: uint16_t
-  restore_value: no
-  initial_value: $transmitter_pin
-
-- id: receiver_pin
-  type: uint16_t
-  restore_value: no
-  initial_value: $receiver_pin
 
 
 ######################################################################
 # Дополняем api
 ######################################################################
-api:
-  services:
-  - service: send_nec_command
-    variables:
-      address_str: string
-      command_str: string
-    then:
-    - remote_transmitter.transmit_nec:
-        address: !lambda 'return (int)strtol(address_str.c_str(), NULL, 16);'
-        command: !lambda 'return (int)strtol(command_str.c_str(), NULL, 16);'
-
-  - service: send_pronto_command
-    variables:
-      data: string
-    then:
-    - remote_transmitter.transmit_pronto:
-        data: !lambda 'return data;'
-
-  - service: send_raw_command # service name (device name will be used as prefix)
-    variables: # list of service params
-      command: int[]
-    then:
-    - remote_transmitter.transmit_raw:
-        carrier_frequency: 38kHz
-        code: !lambda 'return command;' # use array from service param
+#api:
 
 
 
@@ -179,32 +134,22 @@ esp8266:
 switch:
 - platform: custom
   lambda: |-
-    auto gree_light_switch = new GreeLightSwitch();
-    App.register_component(gree_light_switch);
-    return {gree_light_switch};
+    auto dysplay = new GreeLightSwitch();
+    App.register_component(dysplay);
+    return {dysplay};
 
   switches:
-    name: "Dalnroom AC light"
-    id: dalnroom_ac_light
-
+    name: "dysplay"
 
 ######################################################################
 # set sensor
 ######################################################################
 sensor:
 - platform: homeassistant
-  name: "Temperature Sensor dalnroom"
+  name: "TemperatureXiaomi"
   entity_id: sensor.temperature_158d00044a05d7
   id: sensor_temp
 
-- platform: custom
-  lambda: |-
-    auto myReceiver = new MyReceiver();
-    App.register_component(myReceiver);
-    return {myReceiver};
-
-  sensors:
-  - name: "myReceiver"
 
 
 ######################################################################
@@ -232,13 +177,13 @@ climate:
 
 - platform: custom
   lambda: |-
-    auto dalnroom_ac = new GreeAC();
-    dalnroom_ac->set_temp_sensor(id(sensor_temp));
-    App.register_component(dalnroom_ac);
-    return {dalnroom_ac};
+    auto gree = new GreeAC();
+    gree->set_temp_sensor(id(sensor_temp));
+    App.register_component(gree);
+    return {gree};
 
   climates:
-  - name: "Dalnroom AC"
+  - name: "Gree"
 
 
 ######################################################################
@@ -250,20 +195,11 @@ remote_receiver:
     inverted: true
     mode:
       input: true
-      analog: false
-      output: false
-      open_drain: false
       pullup: true
-      pulldown: false
-  #  dump: raw
   dump: all
-  tolerance: 25
-  buffer_size: 1024 #1000
   filter: 50us #50us
   idle: 10ms #10ms
   memory_blocks: 3
-
-
 
 
 ######################################################################
@@ -273,11 +209,4 @@ remote_transmitter:
   pin:
     number: $transmitter_pin
     inverted: false
-    mode:
-      output: true
-      analog: false
-      input: false
-      open_drain: false
-      pullup: false
-      pulldown: false
   carrier_duty_percent: 50%

@@ -3,218 +3,218 @@ ac_daln:
 
   input_number:
 
-    status_climate_dalnroom_temp:
-      name: "Целевая температура DalnroomAC"
-      step: 1
+    status_climate_dalnac_temp:
+      name: "Целевая температура DalnAC"
       min: 10
       max: 35
 
 
   input_text:
 
-    status_climate_dalnroom_hvac:
-      name: "Режим DalnroomAC"
+    status_climate_dalnac_hvac:
+      name: "Режим DalnAC"
 
-    status_climate_dalnroom_fan:
-      name: "Fan DalnroomAC"
+    status_climate_dalnac_fan:
+      name: "Fan DalnAC"
 
-    status_climate_dalnroom_swing:
-      name: "Swing DalnroomAC"
+    status_climate_dalnac_swing:
+      name: "Swing DalnAC"
 
-    status_climate_dalnroom_preset:
-      name: "Preset  DalnroomAC"
+    status_climate_dalnac_preset:
+      name: "Preset  DalnAC"
 
   sensor:
 
   - platform: template
     sensors:
-      status_climate_dalnroom_hvac:
-        friendly_name: "Режим DalnroomAC"
+      status_climate_dalnac_hvac:
+        friendly_name: "Режим DalnAC"
         value_template: >-
-          {% if is_state('input_text.status_climate_dalnroom_hvac', 'off') %}
+          {% if is_state('input_text.status_climate_dalnac_hvac', 'off') %}
             Выключен
-          {% elif is_state('input_text.status_climate_dalnroom_hvac', 'heat_cool') %}
+          {% elif is_state('input_text.status_climate_dalnac_hvac', 'heat_cool') %}
             Авто
-          {% elif is_state('input_text.status_climate_dalnroom_hvac', 'cool') %}
+          {% elif is_state('input_text.status_climate_dalnac_hvac', 'cool') %}
             Охлаждение
-          {% elif is_state('input_text.status_climate_dalnroom_hvac', 'heat') %}
+          {% elif is_state('input_text.status_climate_dalnac_hvac', 'heat') %}
             Обогрев
-          {% elif is_state('input_text.status_climate_dalnroom_hvac', 'dry') %}
+          {% elif is_state('input_text.status_climate_dalnac_hvac', 'dry') %}
             Осушение
-          {% elif is_state('input_text.status_climate_dalnroom_hvac', 'fan_only') %}
+          {% elif is_state('input_text.status_climate_dalnac_hvac', 'fan_only') %}
             Вентилятор
           {% else %}
             Неопределено
           {% endif %}
 
-      status_climate_dalnroom_fan:
-        friendly_name: "Fan DalnroomAC"
+      status_climate_dalnac_fan:
+        friendly_name: "Fan DalnAC"
         value_template: >-
-          {% if is_state('input_text.status_climate_dalnroom_fan', 'auto') %}
+          {% if is_state('input_text.status_climate_dalnac_fan', 'auto') %}
             Авто
-          {% elif is_state('input_text.status_climate_dalnroom_fan', 'low') %}
+          {% elif is_state('input_text.status_climate_dalnac_fan', 'low') %}
             Низкий
-          {% elif is_state('input_text.status_climate_dalnroom_fan', 'medium') %}
+          {% elif is_state('input_text.status_climate_dalnac_fan', 'medium') %}
             Средний
-          {% elif is_state('input_text.status_climate_dalnroom_fan', 'high') %}
+          {% elif is_state('input_text.status_climate_dalnac_fan', 'high') %}
             Высокий
-          {% elif is_state('input_text.status_climate_dalnroom_fan', 'focus') %}
+          {% elif is_state('input_text.status_climate_dalnac_fan', 'focus') %}
             Турбо
           {% else %}
             Неопределено
           {% endif %}    
 
-      status_climate_dalnroom_swing:
-        friendly_name: "Swing DalnroomAC"
+      status_climate_dalnac_swing:
+        friendly_name: "Swing DalnAC"
         value_template: >-
-          {% if is_state('input_text.status_climate_dalnroom_swing', 'off') %}
+          {% if is_state('input_text.status_climate_dalnac_swing', 'off') %}
             Отключено
-          {% elif is_state('input_text.status_climate_dalnroom_swing', 'vertical') %}
+          {% elif is_state('input_text.status_climate_dalnac_swing', 'vertical') %}
             Включено
-          {% elif is_state('input_text.status_climate_dalnroom_swing', 'both') %}
+          {% elif is_state('input_text.status_climate_dalnac_swing', 'both') %}
             Вниз
-          {% elif is_state('input_text.status_climate_dalnroom_swing', 'horizontal') %}
+          {% elif is_state('input_text.status_climate_dalnac_swing', 'horizontal') %}
             Вверх
           {% else %}
             Неопределено
           {% endif %}
       
 
-      status_climate_dalnroom_preset:
-        friendly_name: "Профиль DalnroomAC"
+      status_climate_dalnac_preset:
+        friendly_name: "Профиль DalnAC"
         value_template: >-
-          {% if is_state('input_text.status_climate_dalnroom_preset', 'activity') %}
+          {% if is_state('input_text.status_climate_dalnac_preset', 'activity') %}
             Активность
-          {% elif is_state('input_text.status_climate_dalnroom_preset', 'away') %}
+          {% elif is_state('input_text.status_climate_dalnac_preset', 'away') %}
             Не дома
-          {% elif is_state('input_text.status_climate_dalnroom_preset', 'boost') %}
+          {% elif is_state('input_text.status_climate_dalnac_preset', 'boost') %}
             Турбо
-          {% elif is_state('input_text.status_climate_dalnroom_preset', 'comfort') %}
+          {% elif is_state('input_text.status_climate_dalnac_preset', 'comfort') %}
             Комфорт
-          {% elif is_state('input_text.status_climate_dalnroom_preset', 'eco') %}
+          {% elif is_state('input_text.status_climate_dalnac_preset', 'eco') %}
             Эко
-          {% elif is_state('input_text.status_climate_dalnroom_preset', 'home') %}
+          {% elif is_state('input_text.status_climate_dalnac_preset', 'home') %}
             Дома
-          {% elif is_state('input_text.status_climate_dalnroom_preset', 'none') %}
+          {% elif is_state('input_text.status_climate_dalnac_preset', 'none') %}
             Нет
-          {% elif is_state('input_text.status_climate_dalnroom_preset', 'sleep') %}
+          {% elif is_state('input_text.status_climate_dalnac_preset', 'sleep') %}
             Сон
           {% else %}
             Неопределено
           {% endif %}
       
 
-      status_climate_dalnroom_temp:
-        friendly_name: "Температура DalnroomAC"
-        value_template: "{{ states('input_number.status_climate_dalnroom_temp') }}"
+      status_climate_dalnac_temp:
+        friendly_name: "Температура DalnAC"
+        value_template: "{{ states('input_number.status_climate_dalnac_temp') }}"
 
 
 
   automation:
-  - id: sync_climate_dalnroom_hvac
-    alias: Sync Climate dalnroom HVAC mode
+  - id: sync_climate_dalnac_hvac
+    alias: Sync Climate DalnAc HVAC mode
     initial_state: 'on'
     trigger:
     - platform: state
-      entity_id: climate.dalnroom_ac
+      entity_id: climate.dalnac_gree
     condition:
       condition: not
       conditions:
       - condition: state
-        entity_id: climate.dalnroom_ac
+        entity_id: climate.dalnac_gree
         state: "unavailable"
     action:
     - service: input_text.set_value
       target:
-        entity_id: input_text.status_climate_dalnroom_hvac
+        entity_id: input_text.status_climate_dalnac_hvac
       data:
-        value: "{{ states('climate.dalnroom_ac') }}"
+        value: "{{ states('climate.dalnac_gree') }}"
 
 
-  - id: sync_climate_dalnroom_fan
-    alias: Sync Climate dalnroom Fan
+  - id: sync_climate_dalnac_fan
+    alias: Sync Climate DalnAc Fan
     trigger:
     - platform: state
-      entity_id: climate.dalnroom_ac
+      entity_id: climate.dalnac_gree
       attribute: fan_mode
     condition:
       condition: not
       conditions:
       - condition: state
-        entity_id: climate.dalnroom_ac
+        entity_id: climate.dalnac_gree
         attribute: fan_mode
         state: 'on'
     action:
     - service: input_text.set_value
       target:
-        entity_id: input_text.status_climate_dalnroom_fan
+        entity_id: input_text.status_climate_dalnac_fan
       data:
-        value: "{{ state_attr('climate.dalnroom_ac','fan_mode') }}"
+        value: "{{ state_attr('climate.dalnac_gree','fan_mode') }}"
 
 
-  - id: sync_climate_dalnroom_swing
-    alias: Sync Climate dalnroom Swing
+  - id: sync_climate_dalnac_swing
+    alias: Sync Climate DalnAc Swing
     trigger:
     - platform: state
-      entity_id: climate.dalnroom_ac
+      entity_id: climate.dalnac_gree
       attribute: swing_mode
     action:
     - service: input_text.set_value
       target:
-        entity_id: input_text.status_climate_dalnroom_swing
+        entity_id: input_text.status_climate_dalnac_swing
       data:
-        value: "{{ state_attr('climate.dalnroom_ac','swing_mode') }}"
+        value: "{{ state_attr('climate.dalnac_gree','swing_mode') }}"
 
 
-  - id: sync_climate_dalnroom_preset
-    alias: Sync Climate dalnroom Preset
+  - id: sync_climate_dalnac_preset
+    alias: Sync Climate DalnAc Preset
     trigger:
     - platform: state
-      entity_id: climate.dalnroom_ac
+      entity_id: climate.dalnac_gree
       attribute: preset_mode
     action:
     - service: input_text.set_value
       target:
-        entity_id: input_text.status_climate_dalnroom_preset
+        entity_id: input_text.status_climate_dalnac_preset
       data:
-        value: "{{ state_attr('climate.dalnroom_ac','preset_mode') }}"
+        value: "{{ state_attr('climate.dalnac_gree','preset_mode') }}"
 
 
-  - id: sync_climate_dalnroom_temp
-    alias: Sync Climate dalnroom Temp
+  - id: sync_climate_dalnac_temp
+    alias: Sync Climate DalnAc Temp
     trigger:
     - platform: state
-      entity_id: climate.dalnroom_ac
+      entity_id: climate.dalnac_gree
       attribute: temperature
     condition:
       condition: not
       conditions:
       - condition: state
-        entity_id: climate.dalnroom_ac
+        entity_id: climate.dalnac_gree
         attribute: temperature
         state: 0
     action:
     - service: input_number.set_value
       target:
-        entity_id: input_number.status_climate_dalnroom_temp
+        entity_id: input_number.status_climate_dalnac_temp
       data:
-        value: "{{ state_attr('climate.dalnroom_ac','temperature') }}"
+        value: "{{ state_attr('climate.dalnac_gree','temperature') }}"
 
 
 
-  - id: sync_climate_dalnroom_irblaster
-    alias: Sync Climate dalnroom back to IR Blaster
+  - id: sync_climate_dalnac_irblaster
+    alias: Sync Climate DalnAc back to IR Blaster
     initial_state: 'on'
     trigger:
       platform: state
-      entity_id: climate.dalnroom_ac
+      entity_id: climate.dalnac_gree
       from: 'unavailable'
     action:
-    - service: esphome.esp_12e_witty_12_set_data
+    - service: esphome.dalnac_set_data
       data:
-        temp: "{{ states('input_number.status_climate_dalnroom_temp') }}"
-        hvac: "{{ states('input_text.status_climate_dalnroom_hvac') }}"
-        fan: "{{ states('input_text.status_climate_dalnroom_fan') }}"
-        swing: "{{ states('input_text.status_climate_dalnroom_swing') }}"
-        light: "{{ false if is_state('input_text.status_climate_dalnroom_hvac', 'off') else true }}"
-        preset: "{{ states('input_text.status_climate_dalnroom_preset') }}"
+        hvac: "{{ states('input_text.status_climate_dalnac_hvac') }}"
+        temp: "{{ states('input_number.status_climate_dalnac_temp') }}"
+        fan: "{{ states('input_text.status_climate_dalnac_fan') }}"
+        swing: "{{ states('input_text.status_climate_dalnac_swing') }}"
+        light: "{{ false if is_state('switch.dalnac_dysplay', 'off') else true }}"
+        preset: "{{ states('input_text.status_climate_dalnac_preset') }}"
+
