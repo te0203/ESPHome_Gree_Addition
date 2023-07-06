@@ -8,7 +8,7 @@
 #include "IRutils.h"
 #include "Arduino.h"
 
-static char const *TAG = "! ! ! ! ! ! ! ! !";
+static char const *TAG = "! ! ! ! ! ! ! ! !";// для вывода в лог
 
 ////////////////////////////////////////////////////////////////////////
 //  ас Объект передатчика
@@ -16,7 +16,7 @@ static char const *TAG = "! ! ! ! ! ! ! ! !";
 //ВНИМАНИЕ !!!!
 //Вручную поменять номер пина как $transmitter_pin перед компиляцией для нового устройства.
 const uint16_t kIrLed = 14;
-IRGreeAC ac(kIrLed);
+IRGreeAC ac(kIrLed); // Инициализируем передатчик
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ const uint16_t kRecvPin = 5;
 uint8_t kTimeout = 50;
 const uint16_t kCaptureBufferSize = 1000;
 const uint16_t kMinUnknownSize = 12;
-IRrecv irrecv(kRecvPin, kCaptureBufferSize, kTimeout, true);
+IRrecv irrecv(kRecvPin, kCaptureBufferSize, kTimeout, true); // Инициализируем приёмник
 decode_results results;
 
 
@@ -36,15 +36,15 @@ decode_results results;
 ////////////////////////////////////////////////////////////////////////
 //  GreeAC Объект климата в НА
 ////////////////////////////////////////////////////////////////////////
+// Component поменял на PollingComponent
+
 class GreeAC : public PollingComponent, public Climate, public CustomAPIDevice
 {
 private:
-
   sensor::Sensor* temp_sensor{nullptr};
 
-
 public:
-  GreeAC() : PollingComponent(500) {}
+  GreeAC() : PollingComponent(500) {} // 500мс частота проверки приёмника
   float get_setup_priority() const override { return esphome::setup_priority::AFTER_WIFI; }
 
   void set_temp_sensor(sensor::Sensor *sensor)
@@ -58,6 +58,7 @@ public:
 
   void setup() override
   {
+  //сервис в НА
     register_service(&GreeAC::set_data, "set_data", {"hvac", "temp", "fan", "swing", "light", "preset"});
 
     ac.begin();
@@ -66,8 +67,9 @@ public:
     irrecv.setUnknownThreshold(kMinUnknownSize);
     irrecv.enableIRIn();
 
-    this->restore_state_(); // Восстановите состояние климатического устройства
+    this->restore_state_(); // Восстановите состояние климатического устройства из НА
 
+    // Инициализируем датчик температуры
     if(this->temp_sensor != nullptr){
       this->temp_sensor->add_on_raw_state_callback([this](float temp) { update_temp(temp); });
     }
@@ -78,23 +80,23 @@ public:
 ////////////////////////////////////////////////////////////////////////
   void update() override
   {
-    if (irrecv.decode(&results))
+    if (irrecv.decode(&results)) //если прочитали с приёмника
     {
-      dumpACInfo(&results);
-      irrecv.resume();
+      dumpACInfo(&results); //Обработка приёма
+      irrecv.resume(); // Слушаем снова
     }
   }
 
 
 ////////////////////////////////////////////////////////////////////////
-//  dumpACInfo
+//  dumpACInfo обработка приёма
 ////////////////////////////////////////////////////////////////////////
 
   void dumpACInfo(decode_results *results) {
 
     std::string description = "";
 
-    if (results->overflow) {
+    if (results->overflow) { // Если слишком большой пакет
       ESP_LOGD(TAG, "IR code is too big for buffer. This result shouldn't be trusted until this is resolved. Edit & increase kCaptureBufferSize.");
     }
 
@@ -107,20 +109,20 @@ public:
 
       getData(ac.toString().c_str()); // Разбираем строку на данные и заносим из в this->
 
-      this->publish_state();// Публикуем данные
+      this->publish_state();// Публикуем данные в НА
 
       ESP_LOGD(TAG, "DumpACInfo after");
       ESP_LOGD(TAG, "Status AC: %s", ac.toString().c_str());// читаем данные из ас(IRGreeAC) после записи
 
     }else{
-      ESP_LOGD(TAG, "DumpACInfo decode NO GREE");
+      ESP_LOGD(TAG, "DumpACInfo decode NO GREE"); // Не поняли пакет
     }
 
   }
 
 
 ////////////////////////////////////////////////////////////////////////
-//  update_temp
+//  update_temp Обновляем датчик температуры
 ////////////////////////////////////////////////////////////////////////
 
   void update_temp(float temp) {
@@ -241,7 +243,7 @@ public:
     }
 
 ////////////////////////////////////////////////////////////////////////
-//  control target_temperature
+//  control target_temperature Желаемая температура
 ////////////////////////////////////////////////////////////////////////
 
     if (call.get_target_temperature().has_value())
@@ -291,7 +293,7 @@ public:
 ////////////////////////////////////////////////////////////////////////
 //  control swingMode
 ////////////////////////////////////////////////////////////////////////
-
+// Поддерживается только 4 режима в НА но что внутри них решать ВАМ
     if (call.get_swing_mode().has_value())
     {
       ClimateSwingMode swingMode = *call.get_swing_mode();
@@ -301,7 +303,7 @@ public:
         ac.setSwingVertical(false, kGreeSwingLastPos);
         break;
       case CLIMATE_SWING_BOTH:
-        ac.setSwingVertical(false, kGreeSwingDown);
+        ac.setSwingVertical(false, kGreeSwingDown); // kGreeSwingDown можно менять
         break;
       case CLIMATE_SWING_HORIZONTAL:
         ac.setSwingVertical(false, kGreeSwingUp);
@@ -327,7 +329,7 @@ public:
 
       }
       // Дома
-      else if (preset == CLIMATE_PRESET_HOME) {
+      else if (preset == CLIMATE_PRESET_HOME) { // Что внутри выбирать ВАМ
         // Включено охлаждение
         ac.on();
         ac.setMode(kGreeCool);
@@ -547,6 +549,9 @@ public:
   }
 
 
+////////////////////////////////////////////////////////////////////////
+//  getData Разбираем строку с пульта
+////////////////////////////////////////////////////////////////////////
   void getData(std::string base_str1){
 
     std::string base_str2;
@@ -562,9 +567,7 @@ public:
     std::string fan;
     std::string swing;
     std::string light;
-//     int hvac_i;
-//     int fan_i;
-//     int swing_i;
+
 
     while (true)
     {
@@ -578,9 +581,7 @@ public:
                 temp2 = base_str2.substr(0, base_str2.find(sep2));
                 if (temp2.size() != 0)
                 {
-                    //cout << temp2 << endl;
                     if (i % 2 == 0) {
-                        //cout << "Ключ: " + temp2 + " ";
                         if (temp2 == "Mode") flag = "Mode";
                         else if(temp2 == "Temp") flag = "Temp";
                         else if (temp2 == "Fan") flag = "Fan";
@@ -589,7 +590,6 @@ public:
                     }
                     else
                     {
-                        //cout << "Значение: " + temp2 << endl;
                         if (flag == "Mode") {
                             hvac = temp2;
                             flag = " ";
@@ -733,6 +733,7 @@ public:
     ESP_LOGD(TAG, "getData: hvac = %s, fan = %s, swing = %s, light = %s, temp = %s",
                                     hvac.c_str(), fan.c_str(), swing.c_str(), light.c_str(), temp.c_str());
 
+//  пример строки с пульта
 //  Model: 2 (YBOFB), Power: On, Mode: 1 (Cool), Temp: 27C, Fan: 1 (Low), Turbo: Off, IFeel: Off,
 //  WiFi: On, XFan: Off, Light: On, Sleep: Off, Swing(V) Mode: Manual, Swing(V): 0 (Last), Timer: Off,
 //  Display Temp: 2 (Inside)
