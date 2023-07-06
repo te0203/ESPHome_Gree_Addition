@@ -555,11 +555,11 @@ public:
   void getData(std::string base_str1){
 
     std::string base_str2;
-	std::string sep1 = ", ";
+    std::string sep1 = ", ";
     std::string sep2 = ": ";
-	size_t sep1_size = sep1.size();
+    size_t sep1_size = sep1.size();
     size_t sep2_size = sep2.size();
-	std::string temp1;
+    std::string temp1;
     std::string temp2;
     std::string flag;
     std::string hvac;
