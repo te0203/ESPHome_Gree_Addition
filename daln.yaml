@@ -3,7 +3,7 @@ ac_daln:
 
   input_number:
 
-    status_climate_dalnac_temp:
+    dalnac_temp:
       name: "Целевая температура DalnAC"
       min: 10
       max: 35
@@ -11,107 +11,145 @@ ac_daln:
 
   input_text:
 
-    status_climate_dalnac_hvac:
+    dalnac_hvac:
       name: "Режим DalnAC"
 
-    status_climate_dalnac_fan:
+    dalnac_fan:
       name: "Fan DalnAC"
 
-    status_climate_dalnac_swing:
+    dalnac_swing:
       name: "Swing DalnAC"
 
-    status_climate_dalnac_preset:
-      name: "Preset  DalnAC"
+    dalnac_preset:
+      name: "Preset DalnAC"
 
-  sensor:
 
-  - platform: template
-    sensors:
-      status_climate_dalnac_hvac:
-        friendly_name: "Режим DalnAC"
-        value_template: >-
-          {% if is_state('input_text.status_climate_dalnac_hvac', 'off') %}
-            Выключен
-          {% elif is_state('input_text.status_climate_dalnac_hvac', 'heat_cool') %}
-            Авто
-          {% elif is_state('input_text.status_climate_dalnac_hvac', 'cool') %}
-            Охлаждение
-          {% elif is_state('input_text.status_climate_dalnac_hvac', 'heat') %}
-            Обогрев
-          {% elif is_state('input_text.status_climate_dalnac_hvac', 'dry') %}
-            Осушение
-          {% elif is_state('input_text.status_climate_dalnac_hvac', 'fan_only') %}
-            Вентилятор
-          {% else %}
-            Неопределено
-          {% endif %}
+  input_boolean:
+    dalnac_xfan:
+      name: "XFan DalnAC"
 
-      status_climate_dalnac_fan:
-        friendly_name: "Fan DalnAC"
-        value_template: >-
-          {% if is_state('input_text.status_climate_dalnac_fan', 'auto') %}
-            Авто
-          {% elif is_state('input_text.status_climate_dalnac_fan', 'low') %}
-            Низкий
-          {% elif is_state('input_text.status_climate_dalnac_fan', 'medium') %}
-            Средний
-          {% elif is_state('input_text.status_climate_dalnac_fan', 'high') %}
-            Высокий
-          {% elif is_state('input_text.status_climate_dalnac_fan', 'focus') %}
-            Турбо
-          {% else %}
-            Неопределено
-          {% endif %}    
 
-      status_climate_dalnac_swing:
-        friendly_name: "Swing DalnAC"
-        value_template: >-
-          {% if is_state('input_text.status_climate_dalnac_swing', 'off') %}
-            Отключено
-          {% elif is_state('input_text.status_climate_dalnac_swing', 'vertical') %}
-            Включено
-          {% elif is_state('input_text.status_climate_dalnac_swing', 'both') %}
-            Вниз
-          {% elif is_state('input_text.status_climate_dalnac_swing', 'horizontal') %}
-            Вверх
-          {% else %}
-            Неопределено
-          {% endif %}
-      
+  input_select:
+    dalnac_myswing:
+      name: mySwing DalnAC
+      options:
+      - "none"
+      - "middleup"
+      - "middle"
+      - "middledown"
+      initial: "none"
 
-      status_climate_dalnac_preset:
-        friendly_name: "Профиль DalnAC"
-        value_template: >-
-          {% if is_state('input_text.status_climate_dalnac_preset', 'activity') %}
-            Активность
-          {% elif is_state('input_text.status_climate_dalnac_preset', 'away') %}
-            Не дома
-          {% elif is_state('input_text.status_climate_dalnac_preset', 'boost') %}
-            Турбо
-          {% elif is_state('input_text.status_climate_dalnac_preset', 'comfort') %}
-            Комфорт
-          {% elif is_state('input_text.status_climate_dalnac_preset', 'eco') %}
-            Эко
-          {% elif is_state('input_text.status_climate_dalnac_preset', 'home') %}
-            Дома
-          {% elif is_state('input_text.status_climate_dalnac_preset', 'none') %}
-            Нет
-          {% elif is_state('input_text.status_climate_dalnac_preset', 'sleep') %}
-            Сон
-          {% else %}
-            Неопределено
-          {% endif %}
-      
 
-      status_climate_dalnac_temp:
-        friendly_name: "Температура DalnAC"
-        value_template: "{{ states('input_number.status_climate_dalnac_temp') }}"
+  template:
 
+  - sensor:
+
+    - name: "dalnac_fan"
+      unique_id: dalnac_fan
+      state: >-
+        {% if is_state_attr('climate.dalnac_gree', 'fan_mode', 'auto') %}
+          Авто
+        {% elif is_state_attr('climate.dalnac_gree', 'fan_mode', 'low') %}
+          Низкий
+        {% elif is_state_attr('climate.dalnac_gree', 'fan_mode', 'medium') %}
+          Средний
+        {% elif is_state_attr('climate.dalnac_gree', 'fan_mode', 'high') %}
+          Высокий
+        {% elif is_state_attr('climate.dalnac_gree', 'fan_mode', 'focus') %}
+          Турбо
+        {% else %}
+          Неопределено
+        {% endif %}
+      icon: >-
+        {% if is_state_attr('climate.dalnac_gree', 'fan_mode', 'auto') %}
+          mdi:fan-auto
+        {% elif is_state_attr('climate.dalnac_gree', 'fan_mode', 'low') %}
+          mdi:fan-speed-1
+        {% elif is_state_attr('climate.dalnac_gree', 'fan_mode', 'medium') %}
+          mdi:fan-speed-2
+        {% elif is_state_attr('climate.dalnac_gree', 'fan_mode', 'high') %}
+          mdi:fan-speed-3
+        {% elif is_state_attr('climate.dalnac_gree', 'fan_mode', 'focus') %}
+          mdi:fan-alert
+        {% else %}
+          mdi:fan
+        {% endif %}    
+
+    - name: "dalnac_swing"
+      unique_id: dalnac_swing
+      state: >-
+        {% if is_state_attr('climate.dalnac_gree', 'swing_mode', 'off') %}
+          Отключено
+        {% elif is_state_attr('climate.dalnac_gree', 'swing_mode', 'vertical') %}
+          Включено
+        {% elif is_state_attr('climate.dalnac_gree', 'swing_mode', 'both') %}
+          Вниз
+        {% elif is_state_attr('climate.dalnac_gree', 'swing_mode', 'horizontal') %}
+          Вверх
+        {% else %}
+          Неопределено
+        {% endif %}
+      icon: >-
+        {% if is_state_attr('climate.dalnac_gree', 'swing_mode', 'off') %}
+          mdi:share-off-outline
+        {% elif is_state_attr('climate.dalnac_gree', 'swing_mode', 'vertical') %}
+          mdi:arrow-up-down
+        {% elif is_state_attr('climate.dalnac_gree', 'swing_mode', 'both') %}
+          mdi:archive-arrow-down-outline
+        {% elif is_state_attr('climate.dalnac_gree', 'swing_mode', 'horizontal') %}
+          mdi:format-horizontal-align-left
+        {% else %}
+          mdi:car-defrost-rear
+        {% endif %} 
+
+    - name: "dalnac_preset"
+      unique_id: dalnac_preset
+      state: >-
+        {% if is_state_attr('climate.dalnac_gree', 'preset_mode', 'activity') %}
+          Активность
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'away') %}
+          Не дома
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'boost') %}
+          Турбо
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'comfort') %}
+          Комфорт
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'eco') %}
+          Эко
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'home') %}
+          Дома
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'none') %}
+          Нет
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'sleep') %}
+          Сон
+        {% else %}
+          Неопределено
+        {% endif %}
+      icon: >-
+        {% if is_state_attr('climate.dalnac_gree', 'preset_mode', 'activity') %}
+          mdi:run
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'away') %}
+          mdi:home-off-outline
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'boost') %}
+          mdi:car-turbocharger
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'comfort') %}
+          mdi:beach
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'eco') %}
+          mdi:sprout
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'home') %}
+          mdi:home-account
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'none') %}
+          mdi:border-none-variant
+        {% elif is_state_attr('climate.dalnac_gree', 'preset_mode', 'sleep') %}
+          mdi:bed-clock
+        {% else %}
+          mdi:location-enter
+        {% endif %} 
 
 
   automation:
+
   - id: sync_climate_dalnac_hvac
-    alias: Sync Climate DalnAc HVAC mode
+    alias: Синхронизация режима кондиционера в дальней комнате
     initial_state: 'on'
     trigger:
     - platform: state
@@ -125,13 +163,12 @@ ac_daln:
     action:
     - service: input_text.set_value
       target:
-        entity_id: input_text.status_climate_dalnac_hvac
+        entity_id: input_text.dalnac_hvac
       data:
         value: "{{ states('climate.dalnac_gree') }}"
 
-
   - id: sync_climate_dalnac_fan
-    alias: Sync Climate DalnAc Fan
+    alias: Синхронизация вентилятора кондиционера в дальней комнате
     trigger:
     - platform: state
       entity_id: climate.dalnac_gree
@@ -146,27 +183,52 @@ ac_daln:
     action:
     - service: input_text.set_value
       target:
-        entity_id: input_text.status_climate_dalnac_fan
+        entity_id: input_text.dalnac_fan
       data:
         value: "{{ state_attr('climate.dalnac_gree','fan_mode') }}"
 
-
   - id: sync_climate_dalnac_swing
-    alias: Sync Climate DalnAc Swing
+    alias: Синхронизация жалюзи кондиционера в дальней комнате
     trigger:
     - platform: state
       entity_id: climate.dalnac_gree
       attribute: swing_mode
     action:
-    - service: input_text.set_value
-      target:
-        entity_id: input_text.status_climate_dalnac_swing
-      data:
-        value: "{{ state_attr('climate.dalnac_gree','swing_mode') }}"
+    - choose:
+      - conditions:
+          not:
+          - condition: state
+            entity_id: climate.dalnac_gree
+            attribute: swing_mode
+            state: 'off'
+        sequence:
+        - service: input_text.set_value
+          target:
+            entity_id: input_text.dalnac_swing
+          data:
+            value: "{{ state_attr('climate.dalnac_gree','swing_mode') }}"
+        - service: input_select.select_option
+          target:
+            entity_id: input_select.dalnac_myswing
+          data:
+            option: "none"
+      - conditions:
+        - condition: state
+          entity_id: climate.dalnac_gree
+          attribute: swing_mode
+          state: 'off'
+        sequence:
+        - service: input_text.set_value
+          target:
+            entity_id: input_text.dalnac_swing
+          data:
+            value: "{{ state_attr('climate.dalnac_gree','swing_mode') }}"
+
+
 
 
   - id: sync_climate_dalnac_preset
-    alias: Sync Climate DalnAc Preset
+    alias: Синхронизация предустановок кондиционера в дальней комнате
     trigger:
     - platform: state
       entity_id: climate.dalnac_gree
@@ -174,13 +236,12 @@ ac_daln:
     action:
     - service: input_text.set_value
       target:
-        entity_id: input_text.status_climate_dalnac_preset
+        entity_id: input_text.dalnac_preset
       data:
         value: "{{ state_attr('climate.dalnac_gree','preset_mode') }}"
 
-
   - id: sync_climate_dalnac_temp
-    alias: Sync Climate DalnAc Temp
+    alias: Синхронизация температуры кондиционера в дальней комнате
     trigger:
     - platform: state
       entity_id: climate.dalnac_gree
@@ -195,14 +256,12 @@ ac_daln:
     action:
     - service: input_number.set_value
       target:
-        entity_id: input_number.status_climate_dalnac_temp
+        entity_id: input_number.dalnac_temp
       data:
         value: "{{ state_attr('climate.dalnac_gree','temperature') }}"
 
-
-
   - id: sync_climate_dalnac_irblaster
-    alias: Sync Climate DalnAc back to IR Blaster
+    alias: Синхронизация команд пульта кондиционера в дальней комнате
     initial_state: 'on'
     trigger:
       platform: state
@@ -211,10 +270,25 @@ ac_daln:
     action:
     - service: esphome.dalnac_set_data
       data:
-        hvac: "{{ states('input_text.status_climate_dalnac_hvac') }}"
-        temp: "{{ states('input_number.status_climate_dalnac_temp') }}"
-        fan: "{{ states('input_text.status_climate_dalnac_fan') }}"
-        swing: "{{ states('input_text.status_climate_dalnac_swing') }}"
+        hvac: "{{ states('input_text.dalnac_hvac') }}"
+        temp: "{{ states('input_number.dalnac_temp') }}"
+        fan: "{{ states('input_text.dalnac_fan') }}"
+        swing: "{{ states('input_text.dalnac_swing') }}"
         light: "{{ false if is_state('switch.dalnac_dysplay', 'off') else true }}"
-        preset: "{{ states('input_text.status_climate_dalnac_preset') }}"
+        preset: "{{ states('input_text.dalnac_preset') }}"
 
+  - id: dalnac_set_mydata
+    alias: Отправка моих данных на кондиционер
+    initial_state: 'on'
+    trigger:
+    - platform: state
+      entity_id: input_boolean.dalnac_xfan
+      to:
+    - platform: state
+      entity_id: input_select.dalnac_myswing
+      not_to: "none"
+    action:
+    - service: esphome.dalnac_set_mydata
+      data:
+        myswing: "{{ states('input_select.dalnac_myswing') }}"
+        xfan: "{{ states('input_boolean.dalnac_xfan') }}"
